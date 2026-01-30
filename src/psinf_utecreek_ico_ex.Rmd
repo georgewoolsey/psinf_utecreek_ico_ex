@@ -13,7 +13,7 @@ editor_options:
 knit: (function(inputFile, encoding){ 
     out_dir <- '../';
     rmarkdown::render(inputFile, encoding = encoding, output_file=file.path(dirname(inputFile), out_dir, 'index.html'));
-    file.copy(from = "..//index.html", to = '..///data//rio_chama_cflrp_202411.html', overwrite = TRUE)
+    file.copy(from = "..//index.html", to = '..///data//psinf_utecreek_ico_ex.html', overwrite = TRUE)
   })
 ---
 
@@ -181,7 +181,7 @@ mapview::mapview(
 )
 ```
 
-```{r}
+```{r, include = F, eval = F}
 # !!!!!!!!!!!!!!!!!!!!!!!!!!for testing 
 new_stand_sf <- 
   stand_sf %>% 
@@ -847,7 +847,7 @@ plt_fnl_1 <-
       "mischief"
       , na.value = "transparent"
       , name = "distance to\nnearest tree (m)"
-      # , limits = c(0,23)
+      , limits = c(0,22)
     ) +
     # openings
     ggplot2::geom_sf(
@@ -858,7 +858,7 @@ plt_fnl_1 <-
       low = "gray77", high = "gray11"
       , labels = scales::comma_format(accuracy = 1)
       , name = latex2exp::TeX("opening\narea ($\\m^2$)")
-      # , limits = c(0,7500)
+      , limits = c(0,11100)
     ) +
     # clumps
     ggnewscale::new_scale_fill() +
@@ -911,7 +911,7 @@ plt_open_1 <-
         low = "gray77", high = "gray11"
         , labels = scales::comma_format(accuracy = 1)
         , name = latex2exp::TeX("opening\narea ($\\m^2$)")
-        # , limits = c(0,7500)
+        , limits = c(0,11100)
       ) +
       # tree points
       ggplot2::geom_sf(data = treetops_clustered, color = "gray88", shape = ".") +
@@ -2745,7 +2745,7 @@ plt_fnl_12 <-
       "mischief"
       , na.value = "transparent"
       , name = "distance to\nnearest tree (m)"
-      # , limits = c(0,23)
+      , limits = c(0,22)
     ) +
     # openings
     ggplot2::geom_sf(
@@ -2756,7 +2756,7 @@ plt_fnl_12 <-
       low = "gray77", high = "gray11"
       , labels = scales::comma_format(accuracy = 1)
       , name = latex2exp::TeX("opening\narea ($\\m^2$)")
-      # , limits = c(0,7500)
+      , limits = c(0,11100)
     ) +
     # clumps
     ggnewscale::new_scale_fill() +
@@ -2809,7 +2809,7 @@ plt_open_12 <-
         low = "gray77", high = "gray11"
         , labels = scales::comma_format(accuracy = 1)
         , name = latex2exp::TeX("opening\narea ($\\m^2$)")
-        # , limits = c(0,7500)
+        , limits = c(0,11100)
       ) +
       # tree points
       ggplot2::geom_sf(data = treetops_clustered_new, color = "gray88", shape = ".") +

@@ -18,6 +18,9 @@ knit: (function(inputFile, encoding){
 ---
 
 ```{r, include=FALSE, warning=F, message=F}
+################################################
+##```{r,eval=T
+################################################
 # clean session
 remove(list = ls())
 gc()
@@ -176,6 +179,39 @@ mapview::mapview(
   , popup = FALSE
   , layer.name = "stand boundary"
 )
+```
+
+```{r}
+# !!!!!!!!!!!!!!!!!!!!!!!!!!for testing 
+new_stand_sf <- 
+  stand_sf %>% 
+  sf::st_point_on_surface() %>% 
+  sf::st_buffer(100) %>% 
+  sf::st_bbox() %>% 
+  sf::st_as_sfc()
+# where?
+mapview::mapview(
+  stand_sf
+  , color = "black"
+  , lwd = 2
+  , alpha.regions = 0
+  , label = FALSE
+  , legend = FALSE
+  , popup = FALSE
+  , layer.name = "stand boundary"
+) +
+  # where?
+  mapview::mapview(
+    new_stand_sf
+    , color = "red"
+    , lwd = 2
+    , alpha.regions = 0
+    , label = FALSE
+    , legend = FALSE
+    , popup = FALSE
+    , layer.name = "test stand boundary"
+  )
+stand_sf <- new_stand_sf
 ```
 
 let's make a base `ggplot2` of the stand
@@ -576,7 +612,7 @@ treetops_sf_with_dbh <- treetops_sf_with_dbh %>%
 # call it
 treetops_clustered <- 
   get_tree_clumps(
-    trees_sf = treetops_sf_with_dbh %>% dplyr::slice_sample(n=6666)
+    trees_sf = treetops_sf_with_dbh # %>% dplyr::slice_sample(n=2222)
     , stand_sf = stand_sf
     , ostory_dbh_cm = my_ostory_dbh_cm
     , clump_dist_m = my_clump_dist_m
@@ -698,7 +734,7 @@ get_clump_summary <- function(get_tree_clumps_ans){
 
 get the clump summary data using `get_clump_summary()`
 
-```{r}
+```{r get-clump-summary1}
 # get it
 clump_polys <- get_clump_summary(get_tree_clumps_ans = treetops_clustered)
 # what?
@@ -798,7 +834,7 @@ gc()
 
 plot the distance raster and openings vector data we just got with overlaid tree clumps and tree points
 
-```{r,eval=F, results=F}
+```{r,eval=T, results=F}
 plt_fnl_1 <- 
   # ggplot2::ggplot() + 
   plt_stand +
@@ -846,7 +882,7 @@ plt_fnl_1 <-
 
 plot it
 
-```{r,eval=F}
+```{r,eval=T}
 # plot
 plt_fnl_1
 # save it
@@ -855,7 +891,7 @@ ggplot2::ggsave("../data/03_clumps_dist.jpg", width = 7, height = 5)
 
 highlight the openings
 
-```{r,eval=F}
+```{r,eval=T}
 plt_open_1 <-
   plt_stand +
       # clumps
@@ -895,7 +931,7 @@ ggplot2::ggsave("../data/04_clumps_openings.jpg", width = 7, height = 5)
 
 combine them with `patchwork`
 
-```{r,eval=F}
+```{r,eval=T}
 plt_fnl_1 + (plt_open_1 + theme(legend.position = "none")) 
 # &
 #   ggplot2::theme(
@@ -1141,16 +1177,16 @@ knitr::include_graphics("https://i.imghippo.com/files/YkdWW1725394855.jpg")
 ########################################################################################
 ########################################################################################
 # desired BA
-  target_ba_ft2_per_ac <- 9 # cannot be > current BA
-  # target_ba_ft2_per_ac <- 50 # cannot be > current BA
+  # target_ba_ft2_per_ac <- 9 # cannot be > current BA
+  target_ba_ft2_per_ac <- 50 # cannot be > current BA
 # desired QMD
   target_qmd_in <- 12
 # desired proportion (%) of trees in each clump size
   # !cannot be create larger proportion of ">25 trees" clump as this would require adding trees...
   # c("Individual", "2-4 trees", 	"5-9 trees", 	"10-15 trees","16-25 trees",">25 trees")
   # c(.18, .33, .24, .10, .15)
-  target_pcts <- c(66, 33, 1, 0, 0, 0)
-  # target_pcts <- c(25, 40, 25, 10, 0, 0)
+  # target_pcts <- c(66, 33, 1, 0, 0, 0)
+  target_pcts <- c(25, 40, 25, 10, 0, 0)
 ########################################################################################
 ########################################################################################
 # desired BA, QMD, and proportion of trees in each clump size
@@ -1164,7 +1200,6 @@ levels(clump_n_trees_grp_summary$clump_n_trees_grp)
 levels(clump_n_trees_grp_summary$clump_n_trees_lb)
 levels(clump_n_trees_grp_summary$clump_n_trees_ub)
 ```
-
 
 Check set up and define data with targets based on [Churchill et al. (2016)](https://scholarworks.umt.edu/ico/3) and their prescription worksheet [Excel file](https://www.dropbox.com/sh/4pb5qpbni32dpwt/AACATRPixTM4clBJ28yNJsYYa?e=1&dl=0) to help develop ICO prescriptions
 
@@ -2215,7 +2250,7 @@ must first have:
 * clump polygons from `get_clump_summary()` named as `clump_polys`
 * target data from `get_target_check_prescription()` named as `prescription_target_data`
 
-```{r}
+```{r cut-cutting}
 # must first have: 
 # 
 # * clustered trees from `get_tree_clumps()`
@@ -2664,13 +2699,13 @@ prescription_trees %>%
   kableExtra::kbl() %>% 
   kableExtra::kable_styling() %>% 
   kableExtra::add_header_above(
-    c(" "=1,"Old"=6)
+    c(" "=1,"Old"=length(unique(prescription_trees$orig_clump_n_trees_grp)))
   )
 ```
 
 get the distance raster and openings vector data 
 
-```{r}
+```{r get-clump-summary2}
 treetops_clustered_new <-
   prescription_trees %>% 
   dplyr::filter(is_keep_tree == 1) %>% 
@@ -2697,7 +2732,7 @@ get_clump_dist_rast_ans2$dist_rast %>% terra::aggregate(2, cores = 4) %>% terra:
 
 plot the prescription
 
-```{r,eval=F}
+```{r,eval=T}
 plt_fnl_12 <- 
   # ggplot2::ggplot() + 
   plt_stand +
@@ -2745,7 +2780,7 @@ plt_fnl_12 <-
 
 plot it
 
-```{r,eval=F}
+```{r,eval=T}
 # plot
 plt_fnl_12
 # save it
@@ -2754,7 +2789,7 @@ ggplot2::ggsave("../data/06_clumps_dist_presciption.jpg", width = 7, height = 5)
 
 highlight the openings
 
-```{r,eval=F}
+```{r,eval=T}
 plt_open_12 <-
   plt_stand +
       # clumps
@@ -2794,7 +2829,7 @@ ggplot2::ggsave("../data/07_clumps_openings_presciption.jpg", width = 7, height 
 
 combine them with `patchwork`
 
-```{r,eval=F}
+```{r,eval=T}
 plt_fnl_12 + (plt_open_12 + theme(legend.position = "none")) 
 # &
 #   ggplot2::theme(
@@ -2807,7 +2842,7 @@ ggplot2::ggsave("../data/08_clumps_combined_prescription.jpg", width = 10, heigh
 
 combine old vs new in plot
 
-```{r,eval=F}
+```{r,eval=T}
 (plt_fnl_1 + labs(subtitle = "Pre-Treatment")) +
   (plt_fnl_12  + labs(subtitle = "Post-Treatment") + theme(legend.position = "none")) &
   theme(plot.subtitle = element_text(size = 10, hjust = 0.5, face = "bold"), legend.title=element_text(size=8), legend.text=element_text(size = 7))
@@ -2817,7 +2852,7 @@ ggplot2::ggsave("../data/09_clumps_dist_compared.jpg", width = 10, height = 7)
 
 combine old vs new openings highlight
 
-```{r,eval=F}
+```{r,eval=T}
 (plt_open_1 + labs(subtitle = "Pre-Treatment")) +
   (plt_open_12  + labs(subtitle = "Post-Treatment") + theme(legend.position = "none")) &
   theme(plot.subtitle = element_text(size = 10, hjust = 0.5, face = "bold"), legend.title=element_text(size=8), legend.text=element_text(size = 7))

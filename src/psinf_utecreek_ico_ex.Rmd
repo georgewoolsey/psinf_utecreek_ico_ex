@@ -835,6 +835,10 @@ gc()
 plot the distance raster and openings vector data we just got with overlaid tree clumps and tree points
 
 ```{r,eval=T, results=F}
+hey_clump_pal <- 
+  harrypotter::hp(n = length(levels(treetops_clustered$clump_n_trees_grp)), house = "always") %>%
+  setNames(levels(treetops_clustered$clump_n_trees_grp))
+# scales::show_col(hey_clump_pal)
 plt_fnl_1 <- 
   # ggplot2::ggplot() + 
   plt_stand +
@@ -867,7 +871,8 @@ plt_fnl_1 <-
       , mapping = ggplot2::aes(fill = clump_n_trees_grp)
       , color = NA
     ) +
-    harrypotter::scale_fill_hp_d("always", name = "clump size", drop = F) +
+    # harrypotter::scale_fill_hp_d("always", name = "clump size", drop = F) +
+    ggplot2::scale_fill_manual(values = hey_clump_pal, name = "clump size", drop = F) +
     # tree points
     ggplot2::geom_sf(data = treetops_clustered, color = "gray88", shape = ".") +
     ggplot2::theme_void() +
@@ -900,7 +905,8 @@ plt_open_1 <-
         , mapping = ggplot2::aes(fill = clump_n_trees_grp)
         , color = NA
       ) +
-      harrypotter::scale_fill_hp_d("always", name = "clump size", drop = F) + 
+      # harrypotter::scale_fill_hp_d("always", name = "clump size", drop = F) + 
+      ggplot2::scale_fill_manual(values = hey_clump_pal, name = "clump size", drop = F) +
       # openings
       ggnewscale::new_scale_fill() +
       ggplot2::geom_sf(
@@ -2714,6 +2720,9 @@ treetops_clustered_new <-
   dplyr::rename_with(
     .cols = tidyselect::starts_with("new_clump_")
     , .fn = ~ stringr::str_remove(.x, "^new_")
+  ) %>% 
+  dplyr::mutate(
+    clump_n_trees_grp = forcats::fct_reorder(clump_n_trees_grp,as.numeric(as.character(clump_n_trees_lb)))
   )
 # dplyr::glimpse(treetops_clustered_new)
 clump_polys_new <- get_clump_summary(treetops_clustered_new)
@@ -2765,7 +2774,8 @@ plt_fnl_12 <-
       , mapping = ggplot2::aes(fill = clump_n_trees_grp)
       , color = NA
     ) +
-    harrypotter::scale_fill_hp_d("always", name = "clump size", drop = F) +
+    # harrypotter::scale_fill_hp_d("always", name = "clump size", drop = F) +
+    ggplot2::scale_fill_manual(values = hey_clump_pal, name = "clump size", drop = F) +
     # tree points
     ggplot2::geom_sf(data = treetops_clustered_new, color = "gray88", shape = ".") +
     ggplot2::theme_void() +
@@ -2798,7 +2808,8 @@ plt_open_12 <-
         , mapping = ggplot2::aes(fill = clump_n_trees_grp)
         , color = NA
       ) +
-      harrypotter::scale_fill_hp_d("always", name = "clump size", drop = F) + 
+      # harrypotter::scale_fill_hp_d("always", name = "clump size", drop = F) + 
+      ggplot2::scale_fill_manual(values = hey_clump_pal, name = "clump size", drop = F) +
       # openings
       ggnewscale::new_scale_fill() +
       ggplot2::geom_sf(
@@ -2847,7 +2858,7 @@ combine old vs new in plot
   (plt_fnl_12  + labs(subtitle = "Post-Treatment") + theme(legend.position = "none")) &
   theme(plot.subtitle = element_text(size = 10, hjust = 0.5, face = "bold"), legend.title=element_text(size=8), legend.text=element_text(size = 7))
 # save it
-ggplot2::ggsave("../data/09_clumps_dist_compared.jpg", width = 10, height = 7)
+ggplot2::ggsave("../data/09_clumps_dist_compared.jpg", width = 10, height = 5.5)
 ```
 
 combine old vs new openings highlight
@@ -2856,7 +2867,7 @@ combine old vs new openings highlight
 (plt_open_1 + labs(subtitle = "Pre-Treatment")) +
   (plt_open_12  + labs(subtitle = "Post-Treatment") + theme(legend.position = "none")) &
   theme(plot.subtitle = element_text(size = 10, hjust = 0.5, face = "bold"), legend.title=element_text(size=8), legend.text=element_text(size = 7))
-ggplot2::ggsave("../data/10_clumps_openings_compared.jpg", width = 10, height = 7)
+ggplot2::ggsave("../data/10_clumps_openings_compared.jpg", width = 10, height = 5.5)
 ```
 
 table comparison
@@ -2979,6 +2990,31 @@ clump_n_trees_grp_summary2 %>%
   ) %>% 
   kableExtra::kable_styling() %>% 
   kableExtra::collapse_rows(columns = 1, valign = "top")
+```
+
+finally, the residual stand conditions based on the this cutting prescription
+
+```{r}
+clump_n_trees_grp_summary2 %>% 
+  dplyr::select(clump_n_trees_grp, pct_stand_n_trees) %>% 
+  dplyr::mutate(
+    pct_stand_n_trees = scales::percent(pct_stand_n_trees,accuracy = 1)
+  ) %>% 
+  tidyr::pivot_wider(names_from = clump_n_trees_grp, values_from = pct_stand_n_trees) %>% 
+  kableExtra::kable(
+    caption = paste0(
+      "Current stand BA (ft<sup>2</sup> ac<sup>-1</sup>): "
+      , clump_n_trees_grp_summary2$stand_basal_area_ft2_per_ac[1] %>% scales::number(accuracy = 0.1)
+      , "<br>Current stand QMD (in): "
+      , clump_n_trees_grp_summary2$stand_qmd_in[1] %>% scales::number(accuracy = 0.1)
+      , "<br>Current stand TPA: "
+      , clump_n_trees_grp_summary2$stand_trees_per_ac[1] %>% scales::number(accuracy = 1)
+    )
+    , escape = F
+    , digits = 1
+  ) %>% 
+  kableExtra::kable_styling() %>% 
+  kableExtra::footnote(general = "values are the percent of trees in each clump size")
 ```
 
 ```{r, warning=FALSE, message=FALSE, echo=FALSE, include=FALSE}

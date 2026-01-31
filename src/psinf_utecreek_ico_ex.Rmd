@@ -2925,12 +2925,18 @@ prescription_target_data %>%
   ) %>%
   kableExtra::kable(
     caption = paste0(
-      "Current stand (ft<sup>2</sup> ac<sup>-1</sup>): "
+      "<b>Stand BA (ft<sup>2</sup> ac<sup>-1</sup>)</b> Current: "
       , clump_n_trees_grp_summary$stand_basal_area_ft2_per_ac[1] %>% scales::number(accuracy = 0.1)
-      , "<br>Current stand QMD (in): "
+      , " | Prescription: "
+      , clump_n_trees_grp_summary2$stand_basal_area_ft2_per_ac[1] %>% scales::number(accuracy = 0.1)
+      , "<br><b>Stand QMD (in)</b> Current: "
       , clump_n_trees_grp_summary$stand_qmd_in[1] %>% scales::number(accuracy = 0.1)
-      , "<br>Current stand TPA: "
+      , " | Prescription: "
+      , clump_n_trees_grp_summary2$stand_qmd_in[1] %>% scales::number(accuracy = 0.1)
+      , "<br><b>Stand TPA</b> Current: "
       , clump_n_trees_grp_summary$stand_trees_per_ac[1] %>% scales::number(accuracy = 1)
+      , " | Prescription: "
+      , clump_n_trees_grp_summary2$stand_trees_per_ac[1] %>% scales::number(accuracy = 1)
     )
     , escape = F
     , digits = 1
@@ -3003,11 +3009,11 @@ clump_n_trees_grp_summary2 %>%
   tidyr::pivot_wider(names_from = clump_n_trees_grp, values_from = pct_stand_n_trees) %>% 
   kableExtra::kable(
     caption = paste0(
-      "Current stand BA (ft<sup>2</sup> ac<sup>-1</sup>): "
+      "Prescription stand BA (ft<sup>2</sup> ac<sup>-1</sup>): "
       , clump_n_trees_grp_summary2$stand_basal_area_ft2_per_ac[1] %>% scales::number(accuracy = 0.1)
-      , "<br>Current stand QMD (in): "
+      , "<br>Prescription stand QMD (in): "
       , clump_n_trees_grp_summary2$stand_qmd_in[1] %>% scales::number(accuracy = 0.1)
-      , "<br>Current stand TPA: "
+      , "<br>Prescription stand TPA: "
       , clump_n_trees_grp_summary2$stand_trees_per_ac[1] %>% scales::number(accuracy = 1)
     )
     , escape = F
